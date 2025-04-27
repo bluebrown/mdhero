@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 	"text/template"
 
@@ -23,13 +24,14 @@ func Run(source string, options ...Option) error {
 }
 
 type Engine struct {
-	Stdin  io.Reader
-	Stdout io.Writer
-	Title  string
-	Source string
-	Target string
-	Flags  Flags
-	Chroma string
+	Stdin    io.Reader
+	Stdout   io.Writer
+	Title    string
+	Source   string
+	Target   string
+	Flags    Flags
+	Chroma   string
+	DiskPath string
 }
 
 func New(source string, options ...Option) *Engine {
@@ -54,8 +56,9 @@ func (f Flags) String() string {
 }
 
 const (
-	DEBUG Flags = 1 << iota
-	HTML
+	DEBUG   Flags = 1 << iota // debug mode
+	HTML                      // output HTML
+	BROWSER                   // open in browser
 )
 
 type Option func(*Engine)
@@ -118,11 +121,24 @@ func (ng *Engine) Run() error {
 		return err
 	}
 
-	if ng.Flags&HTML != 0 {
-		return ng.html(w, b)
+	var sink func(io.Writer, []byte) error
+
+	if ng.Flags&HTML == HTML {
+		sink = ng.html
+	} else {
+		sink = ng.ansi
 	}
 
-	return ng.ansi(w, b)
+	if err := sink(w, b); err != nil {
+		return err
+	}
+
+	if ok := HTML | BROWSER; ng.Flags&ok == ok {
+		fmt.Fprintf(os.Stderr, "attempting to open %s in the browser...\n", ng.Target)
+		openBrowser(ng.Target)
+	}
+
+	return nil
 }
 
 func (ng *Engine) ansi(w io.Writer, markdown []byte) error {
@@ -234,3 +250,7 @@ pre:has(code) { border-radius: 7px; }
 </body>
 </html>
 `
+
+func openBrowser(target string) error {
+	return exec.Command("open", target).Run()
+}

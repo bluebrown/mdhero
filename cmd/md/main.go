@@ -13,9 +13,10 @@ func main() {
 	var mdflags mdhero.Flags
 	flag.Var(bit(&mdflags, mdhero.DEBUG), "debug", "print debug messages")
 	flag.Var(bit(&mdflags, mdhero.HTML), "html", "enable HTML output")
+	flag.Var(bit(&mdflags, mdhero.BROWSER), "browser", "open in browser")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] <source> [<target>]")
+		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] [-browser] <source> [<target>]")
 	}
 
 	flag.Parse()
