@@ -16,13 +16,13 @@ work with markdown files.
 
 ## Features
 
-- [ ] ANSI Rendering
+- [x] ANSI Rendering
 - [ ] HTML Rendering
   - [ ] Mermaid diagrams
   - [ ] Heading Anchors
   - [ ] TOC Generation
-- [ ] Github flavored markdown
-- [ ] Syntax highlighting
+- [x] Github flavored markdown
+- [x] Syntax highlighting
 - [ ] Limited Styling
 - [ ] Live preview
 - [ ] Directory Mode
