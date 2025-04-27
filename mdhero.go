@@ -230,7 +230,7 @@ const pageTemplate = `<!DOCTYPE html>
 <title>{{.Title}}</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <style>
-:is(h1, h2, h3, h4, h5, h6) { position: relative; left: -28; }
+:is(h1, h2, h3, h4, h5, h6) { position: relative; left: -28px; }
 a.anchor { color: inherit; visibility: hidden; }
 :has( > a.anchor):hover a.anchor { visibility: visible; }
 body { background-color: #1a1b26; color: #c8d3f5; }
