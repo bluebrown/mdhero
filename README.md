@@ -38,5 +38,11 @@ go install github.com/bluebrown/markdown-hero/cmd/md@latest
 ## Usage
 
 ```bash
-md [-debug] [-html] <source>
+md [-debug] [-html] <source> [<target>]
 ```
+
+> [!NOTE]
+> Depending on the mode (html or ansi) an empty target has different semantics.
+>
+> - In ANSI mode, the target is set to `-`, which means write to stdout.
+> - In HTML mode, the target is set to the source file with a `.html` extension.

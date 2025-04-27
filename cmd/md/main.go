@@ -15,7 +15,7 @@ func main() {
 	flag.Var(bit(&mdflags, mdhero.HTML), "html", "enable HTML output")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] <source>")
+		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] <source> [<target>]")
 	}
 
 	flag.Parse()
@@ -25,11 +25,13 @@ func main() {
 		os.Exit(64)
 	}
 
-	opts := []mdhero.Option{
-		mdhero.WithFlags(mdflags),
+	md := mdhero.New(flag.Args()[0], mdhero.WithFlags(mdflags))
+
+	if len(flag.Args()) > 1 {
+		md.Target = flag.Args()[1]
 	}
 
-	if err := mdhero.Run(flag.Args()[0], opts...); err != nil {
+	if err := md.Run(); err != nil {
 		flag.Usage()
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(65)
