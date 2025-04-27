@@ -38,7 +38,7 @@ go install github.com/bluebrown/markdown-hero/cmd/md@latest
 ## Usage
 
 ```bash
-md [-debug] [-html] <source> [<target>]
+md [-html] <source> [<target>]
 ```
 
 > [!NOTE]
