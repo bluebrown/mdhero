@@ -2,9 +2,17 @@ module github.com/bluebrown/mdhero
 
 go 1.24.2
 
-require github.com/charmbracelet/glamour v0.10.0
+require (
+	github.com/charmbracelet/glamour v0.10.0
+	github.com/yuin/goldmark v1.7.10
+	github.com/yuin/goldmark-highlighting v0.0.0-20220208100518-594be1970594
+	github.com/yuin/goldmark-meta v1.1.0
+	go.abhg.dev/goldmark/anchor v0.2.0
+	go.abhg.dev/goldmark/mermaid v0.5.0
+)
 
 require (
+	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -24,10 +32,10 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	github.com/yuin/goldmark v1.7.10 // indirect
 	github.com/yuin/goldmark-emoji v1.0.5 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

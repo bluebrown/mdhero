@@ -17,9 +17,9 @@ work with markdown files.
 ## Features
 
 - [x] ANSI Rendering
-- [ ] HTML Rendering
-  - [ ] Mermaid diagrams
-  - [ ] Heading Anchors
+- [x] HTML Rendering
+  - [x] Mermaid diagrams
+  - [x] Heading Anchors
   - [ ] TOC Generation
 - [x] Github flavored markdown
 - [x] Syntax highlighting

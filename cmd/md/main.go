@@ -16,6 +16,7 @@ func main() {
 	)
 
 	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.DEBUG}, "debug", "print debug messages")
+	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.HTML}, "html", "enable HTML output")
 
 	flag.Parse()
 
