@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"strings"
 	"text/template"
@@ -46,6 +45,10 @@ func New(source string, options ...Option) *Engine {
 
 type Flags uint8
 
+func (f Flags) String() string {
+	return fmt.Sprintf("%08b", f)
+}
+
 const (
 	DEBUG Flags = 1 << iota
 	HTML
@@ -77,17 +80,6 @@ func WithChroma(chroma string) Option {
 	}
 }
 
-func (f Flags) String() string {
-	return fmt.Sprintf("%08b", f)
-}
-
-func modeName(flags Flags) string {
-	if flags&HTML != 0 {
-		return "HTML"
-	}
-	return "ANSI"
-}
-
 func (ng *Engine) Run() error {
 	if ng.Target == "" && ng.Flags&HTML == 0 {
 		ng.Target = "-"
@@ -101,12 +93,9 @@ func (ng *Engine) Run() error {
 		}
 	}
 
-	slog.Debug("engine",
-		"source", ng.Source,
-		"target", ng.Target,
-		"flags", ng.Flags.String(),
-		"mode", modeName(ng.Flags),
-		"chroma", ng.Chroma)
+	if ng.Flags&DEBUG != 0 {
+		fmt.Fprintf(os.Stderr, "%+v\n", ng)
+	}
 
 	b, err := readFile(ng.Source)
 	if err != nil {
@@ -118,22 +107,14 @@ func (ng *Engine) Run() error {
 		return err
 	}
 
-	if ng.Flags&HTML == 0 {
-		return ansi(w, b)
+	if ng.Flags&HTML != 0 {
+		return ng.html(w, b)
 	}
 
-	gm := newGoldmark(ng.Chroma)
-
-	var buf bytes.Buffer
-
-	if err := gm.Convert(b, &buf); err != nil {
-		return err
-	}
-
-	return html(w, defaultingTitle(ng.Title, ng.Source), buf.String())
+	return ng.ansi(w, b)
 }
 
-func ansi(w io.Writer, markdown []byte) error {
+func (ng *Engine) ansi(w io.Writer, markdown []byte) error {
 	out, err := glamour.RenderBytes(markdown, "dark")
 	if err != nil {
 		return err
@@ -142,11 +123,22 @@ func ansi(w io.Writer, markdown []byte) error {
 	return nil
 }
 
-func html(w io.Writer, title, content string) error {
-	tpl := template.Must(template.New("page").Parse(pageTemplate))
+func (ng *Engine) html(w io.Writer, markdown []byte) error {
+	var (
+		title = defaultingTitle(ng.Title, ng.Source)
+		gm    = newGoldmark(ng.Chroma)
+		buf   bytes.Buffer
+	)
+
+	if err := gm.Convert(markdown, &buf); err != nil {
+		return err
+	}
+
+	tpl := template.Must(template.New(title).Parse(pageTemplate))
+
 	return tpl.Execute(w, pageContext{
 		Title:   title,
-		Content: content,
+		Content: buf.String(),
 	})
 }
 

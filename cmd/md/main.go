@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
 
@@ -12,30 +11,21 @@ import (
 
 func main() {
 	var (
-		logLevel = slog.LevelInfo
-		mdflags  = mdhero.Flags(0)
+		mdflags = mdhero.Flags(0)
 	)
 
 	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.DEBUG}, "debug", "print debug messages")
 	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.HTML}, "html", "enable HTML output")
 
 	flag.Usage = func() {
-		fmt.Println("md [-debug] [-html] <source>")
+		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] <source>")
 	}
 
 	flag.Parse()
 
-	if mdflags&mdhero.DEBUG != 0 {
-		logLevel = slog.LevelDebug
-	}
-
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: logLevel,
-	})))
-
 	if len(flag.Args()) < 1 {
-		slog.Error("no input file specified")
-		os.Exit(1)
+		flag.Usage()
+		os.Exit(64)
 	}
 
 	opts := []mdhero.Option{
@@ -43,8 +33,9 @@ func main() {
 	}
 
 	if err := mdhero.Run(flag.Args()[0], opts...); err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
+		flag.Usage()
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(65)
 	}
 }
 

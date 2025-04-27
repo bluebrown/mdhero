@@ -21,6 +21,7 @@ work with markdown files.
   - [x] Mermaid diagrams
   - [x] Heading Anchors
   - [ ] TOC Generation
+  - [ ] Front Matter
 - [x] Github flavored markdown
 - [x] Syntax highlighting
 - [ ] Limited Styling
