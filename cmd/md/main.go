@@ -10,12 +10,9 @@ import (
 )
 
 func main() {
-	var (
-		mdflags = mdhero.Flags(0)
-	)
-
-	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.DEBUG}, "debug", "print debug messages")
-	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.HTML}, "html", "enable HTML output")
+	var mdflags mdhero.Flags
+	flag.Var(bit(&mdflags, mdhero.DEBUG), "debug", "print debug messages")
+	flag.Var(bit(&mdflags, mdhero.HTML), "html", "enable HTML output")
 
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "usage: md [-debug] [-html] <source>")
@@ -39,23 +36,27 @@ func main() {
 	}
 }
 
-type BitFlag[T ~uint8] struct {
-	Field *T
-	Mask  T
+func bit(field *mdhero.Flags, mask mdhero.Flags) *bitFlag {
+	return &bitFlag{Field: field, Mask: mask}
 }
 
-func (f *BitFlag[T]) String() string {
+type bitFlag struct {
+	Field *mdhero.Flags
+	Mask  mdhero.Flags
+}
+
+func (f *bitFlag) String() string {
 	if f.Field == nil {
 		return "nil"
 	}
 	return strconv.FormatUint(uint64(*f.Field), 10)
 }
 
-func (f *BitFlag[T]) IsBoolFlag() bool {
+func (f *bitFlag) IsBoolFlag() bool {
 	return true
 }
 
-func (f *BitFlag[T]) Set(s string) error {
+func (f *bitFlag) Set(s string) error {
 	v, err := strconv.ParseBool(s)
 	if err != nil {
 		return err
