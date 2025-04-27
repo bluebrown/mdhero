@@ -10,7 +10,7 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/yuin/goldmark"
-	highlighting "github.com/yuin/goldmark-highlighting"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -37,7 +37,7 @@ func New(source string, options ...Option) *Engine {
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Source: source,
-		Chroma: "nordic",
+		Chroma: "tokyonight-moon",
 	}
 
 	for _, opt := range options {
@@ -205,25 +205,21 @@ type pageContext struct {
 	Content string
 }
 
-const pageTemplate = `<!DOCTYPE html lANG="en">
-<html>
+const pageTemplate = `<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{.Title}}</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <style>
-:is(h1, h2, h3, h4, h5, h6) {
-  position: relative;
-  left: -28;
-}
-a.anchor { 
-  color: inherit; 
-  visibility: hidden;
-}
-:has( > a.anchor):hover a.anchor { 
-  visibility: visible; 
-}
+:is(h1, h2, h3, h4, h5, h6) { position: relative; left: -28; }
+a.anchor { color: inherit; visibility: hidden; }
+:has( > a.anchor):hover a.anchor { visibility: visible; }
+body { background-color: #1a1b26; color: #c8d3f5; }
+code {  background-color: #222436; color: #4fd6be; }
+.content :is(h1, h2, h3, h4, h5, h6) { color: inherit; }
+pre:has(code) { border-radius: 7px; }
 </style>
 </head>
 <body>
