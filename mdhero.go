@@ -23,6 +23,8 @@ func Run(source string, options ...Option) error {
 }
 
 type Engine struct {
+	Stdin  io.Reader
+	Stdout io.Writer
 	Title  string
 	Source string
 	Target string
@@ -32,6 +34,8 @@ type Engine struct {
 
 func New(source string, options ...Option) *Engine {
 	m := &Engine{
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
 		Source: source,
 		Chroma: "nordic",
 	}
@@ -55,6 +59,13 @@ const (
 )
 
 type Option func(*Engine)
+
+func WithStdIO(r io.Reader, w io.Writer) Option {
+	return func(m *Engine) {
+		m.Stdin = r
+		m.Stdout = w
+	}
+}
 
 func WithTitle(title string) Option {
 	return func(m *Engine) {
@@ -97,12 +108,12 @@ func (ng *Engine) Run() error {
 		fmt.Fprintf(os.Stderr, "%+v\n", ng)
 	}
 
-	b, err := readFile(ng.Source)
+	b, err := ng.sourceReader()
 	if err != nil {
 		return err
 	}
 
-	w, err := getWriter(ng.Target)
+	w, err := ng.targetWriter()
 	if err != nil {
 		return err
 	}
@@ -142,11 +153,11 @@ func (ng *Engine) html(w io.Writer, markdown []byte) error {
 	})
 }
 
-func readFile(src string) ([]byte, error) {
-	if src == "-" {
-		return io.ReadAll(os.Stdin)
+func (ng *Engine) sourceReader() ([]byte, error) {
+	if ng.Source == "-" {
+		return io.ReadAll(ng.Stdin)
 	}
-	f, err := os.Open(src)
+	f, err := os.Open(ng.Source)
 	if err != nil {
 		return nil, err
 	}
@@ -154,11 +165,11 @@ func readFile(src string) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
-func getWriter(target string) (io.Writer, error) {
-	if target == "-" {
-		return os.Stdout, nil
+func (ng *Engine) targetWriter() (io.Writer, error) {
+	if ng.Target == "-" {
+		return ng.Stdout, nil
 	}
-	f, err := os.Create(target)
+	f, err := os.Create(ng.Target)
 	if err != nil {
 		return nil, fmt.Errorf("create target file: %w", err)
 	}
