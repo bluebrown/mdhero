@@ -171,8 +171,9 @@ func (ng *Engine) targetWriter() (io.Writer, error) {
 	}
 	f, err := os.Create(ng.Target)
 	if err != nil {
-		return nil, fmt.Errorf("create target file: %w", err)
+		return nil, err
 	}
+	fmt.Fprintf(os.Stderr, "writing %s\n", ng.Target)
 	return f, nil
 }
 
