@@ -49,9 +49,9 @@ type bitFlag struct {
 
 func (f *bitFlag) String() string {
 	if f.Field == nil {
-		return "nil"
+		return "false"
 	}
-	return strconv.FormatUint(uint64(*f.Field), 10)
+	return strconv.FormatBool((*f.Field & f.Mask) != 0)
 }
 
 func (f *bitFlag) IsBoolFlag() bool {
