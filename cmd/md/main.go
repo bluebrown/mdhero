@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"strconv"
@@ -17,6 +18,10 @@ func main() {
 
 	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.DEBUG}, "debug", "print debug messages")
 	flag.Var(&BitFlag[mdhero.Flags]{Field: &mdflags, Mask: mdhero.HTML}, "html", "enable HTML output")
+
+	flag.Usage = func() {
+		fmt.Println("md [-debug] [-html] <source>")
+	}
 
 	flag.Parse()
 

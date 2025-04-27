@@ -27,3 +27,15 @@ work with markdown files.
 - [ ] Live preview
 - [ ] Directory Mode
 - [ ] Remote Sources
+
+## Installation
+
+```bash
+go install github.com/bluebrown/markdown-hero/cmd/md@latest
+```
+
+## Usage
+
+```bash
+md [-debug] [-html] <source>
+```
