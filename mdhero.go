@@ -95,41 +95,29 @@ func WithChroma(chroma string) Option {
 }
 
 func (ng *Engine) Run() error {
-	if ng.Target == "" && ng.Flags&HTML == 0 {
-		ng.Target = "-"
-	}
-
-	if ng.Target == "" {
-		if ng.Source == "-" {
-			ng.Target = "-"
-		} else {
-			ng.Target = strings.TrimSuffix(ng.Source, ".md") + ".html"
-		}
-	}
-
 	if ng.Flags&DEBUG != 0 {
 		fmt.Fprintf(os.Stderr, "%+v\n", ng)
 	}
 
-	b, err := ng.sourceReader()
+	raw, err := ng.readSource()
 	if err != nil {
 		return err
 	}
 
-	w, err := ng.targetWriter()
-	if err != nil {
-		return err
-	}
-
-	var sink func(io.Writer, []byte) error
+	var render func([]byte) ([]byte, error)
 
 	if ng.Flags&HTML == HTML {
-		sink = ng.html
+		render = ng.html
 	} else {
-		sink = ng.ansi
+		render = ng.ansi
 	}
 
-	if err := sink(w, b); err != nil {
+	res, err := render(raw)
+	if err != nil {
+		return err
+	}
+
+	if err := ng.writeTarget(res); err != nil {
 		return err
 	}
 
@@ -141,35 +129,33 @@ func (ng *Engine) Run() error {
 	return nil
 }
 
-func (ng *Engine) ansi(w io.Writer, markdown []byte) error {
-	out, err := glamour.RenderBytes(markdown, "dark")
-	if err != nil {
-		return err
-	}
-	_, err = w.Write(out)
-	return nil
+func (ng *Engine) ansi(markdown []byte) ([]byte, error) {
+	return glamour.RenderBytes(markdown, "dark")
 }
 
-func (ng *Engine) html(w io.Writer, markdown []byte) error {
+func (ng *Engine) html(markdown []byte) ([]byte, error) {
 	var (
 		title = defaultingTitle(ng.Title, ng.Source)
 		gm    = newGoldmark(ng.Chroma)
-		buf   bytes.Buffer
 	)
 
-	if err := gm.Convert(markdown, &buf); err != nil {
-		return err
+	var md bytes.Buffer
+	if err := gm.Convert(markdown, &md); err != nil {
+		return nil, err
 	}
 
 	tpl := template.Must(template.New(title).Parse(pageTemplate))
 
-	return tpl.Execute(w, pageContext{
+	var htm bytes.Buffer
+	err := tpl.Execute(&htm, pageContext{
 		Title:   title,
-		Content: buf.String(),
+		Content: md.String(),
 	})
+
+	return htm.Bytes(), err
 }
 
-func (ng *Engine) sourceReader() ([]byte, error) {
+func (ng *Engine) readSource() ([]byte, error) {
 	if ng.Source == "-" {
 		return io.ReadAll(ng.Stdin)
 	}
@@ -181,16 +167,36 @@ func (ng *Engine) sourceReader() ([]byte, error) {
 	return io.ReadAll(f)
 }
 
-func (ng *Engine) targetWriter() (io.Writer, error) {
-	if ng.Target == "-" {
-		return ng.Stdout, nil
+func (ng *Engine) configureTargetPath() {
+	if ng.Target == "" && ng.Flags&HTML == 0 {
+		ng.Target = "-"
 	}
-	f, err := os.Create(ng.Target)
-	if err != nil {
-		return nil, err
+
+	if ng.Target == "" {
+		if ng.Source == "-" {
+			ng.Target = "-"
+		} else {
+			ng.Target = strings.TrimSuffix(ng.Source, ".md") + ".html"
+		}
 	}
+}
+
+func (ng *Engine) writeTarget(data []byte) error {
+	ng.configureTargetPath()
+
+	var w io.Writer = ng.Stdout
+	if ng.Target != "-" {
+		f, err := os.Create(ng.Target)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		w = f
+	}
+
 	fmt.Fprintf(os.Stderr, "writing %s\n", ng.Target)
-	return f, nil
+	_, err := w.Write(data)
+	return err
 }
 
 func newGoldmark(codeStyle string) goldmark.Markdown {
