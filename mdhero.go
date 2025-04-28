@@ -2,12 +2,14 @@ package mdhero
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/yuin/goldmark"
@@ -123,7 +125,7 @@ func (ng *Engine) Run() error {
 
 	if ok := HTML | BROWSER; ng.Flags&ok == ok {
 		fmt.Fprintf(os.Stderr, "attempting to open %s in the browser...\n", ng.Target)
-		openBrowser(ng.Target)
+		openBrowser(ng.Target, ng.Flags&DEBUG != 0)
 	}
 
 	return nil
@@ -257,6 +259,42 @@ pre:has(code) { border-radius: 7px; }
 </html>
 `
 
-func openBrowser(target string) error {
-	return exec.Command("open", target).Run()
+var browers = []string{
+	os.Getenv("BROWSER"),
+	os.Getenv("XDG_OPEN"),
+	"xdg-open",
+	"open",
+	"start",
+}
+
+func openBrowser(target string, debug bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	exe := anyExecutable(browers)
+	if exe == "" {
+		if debug {
+			fmt.Fprintf(os.Stderr, "no browser found\n")
+		}
+		return nil
+	}
+
+	if err := exec.CommandContext(ctx, exe, target).Start(); err != nil && debug {
+		fmt.Fprintf(os.Stderr, "failed to open browser: %v\n", err)
+	}
+
+	return nil
+}
+
+func anyExecutable(tryNames []string) string {
+	for _, name := range tryNames {
+		if name == "" {
+			continue
+		}
+		if _, err := exec.LookPath(name); err != nil {
+			continue
+		}
+		return name
+	}
+	return ""
 }
