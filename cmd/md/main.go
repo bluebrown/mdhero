@@ -40,19 +40,19 @@ func main() {
 }
 
 func bit(field *mdhero.Flags, mask mdhero.Flags) *bitFlag {
-	return &bitFlag{Field: field, Mask: mask}
+	return &bitFlag{Flags: field, Mask: mask}
 }
 
 type bitFlag struct {
-	Field *mdhero.Flags
+	Flags *mdhero.Flags
 	Mask  mdhero.Flags
 }
 
 func (f *bitFlag) String() string {
-	if f.Field == nil {
+	if f.Flags == nil {
 		return "false"
 	}
-	return strconv.FormatBool((*f.Field & f.Mask) != 0)
+	return strconv.FormatBool((*f.Flags & f.Mask) != 0)
 }
 
 func (f *bitFlag) IsBoolFlag() bool {
@@ -65,9 +65,9 @@ func (f *bitFlag) Set(s string) error {
 		return err
 	}
 	if v {
-		*f.Field |= f.Mask
+		*f.Flags |= f.Mask
 	} else {
-		*f.Field &^= f.Mask
+		*f.Flags &^= f.Mask
 	}
 	return nil
 }
