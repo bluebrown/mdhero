@@ -230,9 +230,9 @@ const pageTemplate = `<!DOCTYPE html>
 <title>{{.Title}}</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <style>
-:is(h1, h2, h3, h4, h5, h6) { position: relative; left: -28px; }
-a.anchor { color: inherit; visibility: hidden; }
-:has( > a.anchor):hover a.anchor { visibility: visible; }
+a.anchor { color: inherit; opacity: 0%; position: absolute; left: -28px; padding-right: 16px; }
+:has( > a.anchor):hover a.anchor { opacity: 100%; }
+:is(h1, h2, h3, h4, h5, h6):before { content: " "; width: 3rem; height: 1rem; }
 body { background-color: #1a1b26; color: #c8d3f5; }
 code {  background-color: #222436; color: #4fd6be; }
 .content :is(h1, h2, h3, h4, h5, h6) { color: inherit; }
