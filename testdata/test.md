@@ -39,3 +39,8 @@ gitGraph
     commit
     commit
 ```
+
+## Some likes to cakes and cats
+
+- <http://cakes.com>
+- <http://cats.com>

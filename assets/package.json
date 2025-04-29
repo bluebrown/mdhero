@@ -1,0 +1,24 @@
+{
+  "name": "mdhero",
+  "version": "0.0.0",
+  "description": "A command line tool to work with markdown files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "sass --load-path=node_modules main.scss bulma.css --style compressed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluebrown/mdhero.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/bluebrown/mdhero/issues"
+  },
+  "homepage": "https://github.com/bluebrown/mdhero#readme",
+  "dependencies": {
+    "bulma": "^1.0.4",
+    "sass": "^1.87.0"
+  }
+}

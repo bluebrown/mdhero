@@ -1,2 +1,4 @@
 *.html
 *.ansi
+node_modules
+*.css.map

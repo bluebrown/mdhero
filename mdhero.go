@@ -1,8 +1,12 @@
 package mdhero
 
+//go:generate npm -C assets install
+//go:generate npm -C assets run build
+
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"fmt"
 	"io"
 	"os"
@@ -151,6 +155,7 @@ func (ng *Engine) html(markdown []byte) ([]byte, error) {
 	var htm bytes.Buffer
 	err := tpl.Execute(&htm, pageContext{
 		Title:   title,
+		Style:   string(bulmaCSS),
 		Content: md.String(),
 	})
 
@@ -227,8 +232,12 @@ func defaultingTitle(title, src string) string {
 
 type pageContext struct {
 	Title   string
+	Style   string
 	Content string
 }
+
+//go:embed assets/bulma.css
+var bulmaCSS []byte
 
 const pageTemplate = `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -236,15 +245,8 @@ const pageTemplate = `<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{.Title}}</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <style>
-a.anchor { color: inherit; opacity: 0%; position: absolute; left: -28px; padding-right: 16px; }
-:has( > a.anchor):hover a.anchor { opacity: 100%; }
-:is(h1, h2, h3, h4, h5, h6):before { content: " "; width: 3rem; height: 1rem; }
-body { background-color: #1a1b26; color: #c8d3f5; }
-code {  background-color: #222436; color: #4fd6be; }
-.content :is(h1, h2, h3, h4, h5, h6) { color: inherit; }
-pre:has(code) { border-radius: 7px; }
+{{.Style}}
 </style>
 </head>
 <body>

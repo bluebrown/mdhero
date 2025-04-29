@@ -1,0 +1,36 @@
+@use "bulma/sass/utilities" with (
+  $family-primary: '"Nunito", sans-serif',
+);
+
+@forward "bulma/sass/base";
+@forward "bulma/sass/layout/container";
+@forward "bulma/sass/elements/content";
+@forward "bulma/sass/themes";
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+
+:root {
+  --bulma-body-background-color: #1a1b26;
+  --bulma-body-color: rgb(200, 211, 245); 
+  --bulma-code-background: #222436;
+  --bulma-code: #4fd6be;
+  --bulma-text-strong: #c8d3f5;
+  --bulma-link-text: #82aaff;
+}
+
+a.anchor { 
+  color: inherit; 
+  opacity: 0%; 
+  position: absolute; 
+  left: -28px; 
+  padding-right: 16px; 
+}
+
+:has( > a.anchor):hover a.anchor { 
+  opacity: 100%; 
+}
+
+:is(h1, h2, h3, h4, h5, h6):before { 
+  content: " "; 
+  width: 3rem; 
+  height: 1rem; 
+}
