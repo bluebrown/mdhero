@@ -1,4 +1,3 @@
+node_modules
 *.html
 *.ansi
-node_modules
-*.css.map

@@ -15,21 +15,6 @@ platforms.
 This tool is designed provide the full set of required features to
 effectively work with markdown files.
 
-## Features
-
-- [x] ANSI Rendering
-- [x] HTML Rendering
-  - [x] Mermaid diagrams
-  - [x] Heading Anchors
-  - [ ] TOC Generation
-  - [ ] Front Matter
-- [x] Github flavored markdown
-- [x] Syntax highlighting
-- [ ] Limited Styling
-- [ ] Live preview
-- [ ] Directory Mode
-- [ ] Remote Sources
-
 ## Installation
 
 ```bash
@@ -55,8 +40,11 @@ Depending on the mode an empty target has different semantics.
 
 ### Browser
 
-If the `-browser` flag is set, the HTML output will be opened in the
-default browser. This is only available in HTML mode. The browser is
-opened on a best effort basis, and may not work on all platforms. If the
-browser fails to open, the HTML file will still be created, and can be
-opened manually.
+If the `-browser` flag is set, the generated HTML file is opened in the
+browser. If `-html` is not explicitly set alongside, HTML output is
+assumed, but the generated file path defaults to os temporary directory,
+instead of following the source file name.
+
+The browser is opened on a best effort basis, and may not work on all
+platforms. If the browser fails to open, the HTML file will still be
+created, and can be opened manually.

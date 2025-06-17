@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
@@ -30,14 +31,13 @@ func Run(source string, options ...Option) error {
 }
 
 type Engine struct {
-	Stdin    io.Reader
-	Stdout   io.Writer
-	Title    string
-	Source   string
-	Target   string
-	Flags    Flags
-	Chroma   string
-	DiskPath string
+	Stdin  io.Reader
+	Stdout io.Writer
+	Title  string
+	Source string
+	Target string
+	Flags  Flags
+	Chroma string
 }
 
 func New(source string, options ...Option) *Engine {
@@ -112,7 +112,7 @@ func (ng *Engine) Run() error {
 
 	var render func([]byte) ([]byte, error)
 
-	if ng.Flags&HTML == HTML {
+	if ng.Flags&(HTML|BROWSER) > 0 {
 		render = ng.html
 	} else {
 		render = ng.ansi
@@ -127,7 +127,7 @@ func (ng *Engine) Run() error {
 		return err
 	}
 
-	if ok := HTML | BROWSER; ng.Flags&ok == ok {
+	if ng.Flags&BROWSER > 0 {
 		fmt.Fprintf(os.Stderr, "attempting to open %s in the browser...\n", ng.Target)
 		openBrowser(ng.Target, ng.Flags&DEBUG != 0)
 	}
@@ -175,17 +175,19 @@ func (ng *Engine) readSource() ([]byte, error) {
 }
 
 func (ng *Engine) configureTargetPath() {
-	if ng.Target == "" && ng.Flags&HTML == 0 {
+	if ng.Target != "" {
+		return
+	}
+	if ng.Flags&(HTML|BROWSER) == 0 {
 		ng.Target = "-"
+		return
 	}
+	if ng.Flags&HTML == 0 {
+		ng.Target = filepath.Join(os.TempDir(), "mdhero.preview.html")
+		return
+	}
+	ng.Target = strings.TrimSuffix(ng.Source, ".md") + ".html"
 
-	if ng.Target == "" {
-		if ng.Source == "-" {
-			ng.Target = "-"
-		} else {
-			ng.Target = strings.TrimSuffix(ng.Source, ".md") + ".html"
-		}
-	}
 }
 
 func (ng *Engine) writeTarget(data []byte) error {
@@ -200,8 +202,9 @@ func (ng *Engine) writeTarget(data []byte) error {
 		defer f.Close()
 		w = f
 	}
-
-	fmt.Fprintf(os.Stderr, "writing %s\n", ng.Target)
+	if ng.Target != "-" || ng.Flags&DEBUG != 0 {
+		fmt.Fprintf(os.Stderr, "writing %s\n", ng.Target)
+	}
 	_, err := w.Write(data)
 	return err
 }
