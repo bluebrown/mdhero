@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "sass --load-path=node_modules main.scss bulma.css --style compressed"
+    "build": "sass --load-path=node_modules main.scss bulma.css --style compressed --no-source-map",
+    "help": "sass --help"
   },
   "repository": {
     "type": "git",

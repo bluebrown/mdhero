@@ -212,7 +212,7 @@ func newGoldmark(codeStyle string) goldmark.Markdown {
 			meta.Meta,
 			extension.GFM,
 			highlighting.NewHighlighting(highlighting.WithStyle(codeStyle)),
-			&mermaid.Extender{},
+			&mermaid.Extender{Theme: "dark"},
 			&anchor.Extender{Texter: anchor.Text("#"), Position: anchor.Before},
 		),
 		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
